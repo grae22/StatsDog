@@ -1,0 +1,6 @@
+*.user
+
+/.vs
+/packages
+/StatsDog/bin
+/StatsDog/obj
