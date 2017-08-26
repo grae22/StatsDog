@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace StatsDog.Models
 {
@@ -17,5 +18,7 @@ namespace StatsDog.Models
 
     [StringLength(32)]
     public string EventName { get; set; }
+
+    public DateTime Timestamp { get; set; } = DateTime.Now;
   }
 }

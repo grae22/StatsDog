@@ -9,6 +9,7 @@ namespace StatsDog
   {
     protected void Application_Start()
     {
+      AutoMapperConfig.Initialise();
       AreaRegistration.RegisterAllAreas();
       GlobalConfiguration.Configure(WebApiConfig.Register);
       FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);

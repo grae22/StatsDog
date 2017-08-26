@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Text;
 using System.Web.Http;
+using AutoMapper;
 using StatsDog.Dtos;
+using StatsDog.Models;
 
 namespace StatsDog.Controllers.Api
 {
   public class StatsController : ApiController
   {
+    //-------------------------------------------------------------------------
+
+    private readonly ApplicationDbContext _applicationDbContext = new ApplicationDbContext();
+
     //-------------------------------------------------------------------------
     // POST: /api/stats
 
@@ -24,14 +29,12 @@ namespace StatsDog.Controllers.Api
       stringBuilder.Append($" {statsDto.SourceName.PadRight(128)} |");
       stringBuilder.Append($" {statsDto.EventName.PadRight(32)} |");
 
-      string output = stringBuilder.ToString();
+      Debug.WriteLine(stringBuilder.ToString());
 
-      Debug.WriteLine(output);
+      Stats stats = Mapper.Map<StatsDto, Stats>(statsDto);
 
-      using (var writer = File.AppendText(@"d:\dev\projects\statsdog\deploy\stats.txt"))
-      {
-        writer.WriteLine(output);
-      }
+      _applicationDbContext.Stats.Add(stats);
+      _applicationDbContext.SaveChanges();
 
       return Ok();
     }

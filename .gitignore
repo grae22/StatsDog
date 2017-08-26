@@ -1,4 +1,6 @@
 *.user
+*.mdf
+*.ldf
 
 /.vs
 /packages
