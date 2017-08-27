@@ -1,4 +1,8 @@
-﻿using System.Web.Mvc;
+﻿using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
+using System.Linq;
+using System.Text;
+using System.Web.Mvc;
 using StatsDog.Models;
 
 namespace StatsDog.Controllers
@@ -7,21 +11,47 @@ namespace StatsDog.Controllers
   {
     //-------------------------------------------------------------------------
 
-    private readonly ApplicationDbContext _applicationDbContext = new ApplicationDbContext();
+    private readonly ApplicationDbContext _context = new ApplicationDbContext();
 
     //-------------------------------------------------------------------------
 
     protected override void Dispose(bool disposing)
     {
-      _applicationDbContext.Dispose();
+      _context.Dispose();
     }
 
     //-------------------------------------------------------------------------
-    // GET: Stats
+    // GET: /Stats/Index
 
     public ViewResult Index()
     {
-      return View(_applicationDbContext.Stats);
+      return View(_context.Stats);
+    }
+
+    //-------------------------------------------------------------------------
+
+    public ViewResult Summary()
+    {
+      var summary = new StatsSummary();
+
+      var query = new StringBuilder();
+      query.Append("SELECT ROUND(AVG(CAST(NumberOfUniqueSourceNamesByDay.[Count] AS float)), 0) ");
+      query.Append("FROM ( ");
+      query.Append("SELECT UniqueSourceNameByDay.[Day], COUNT(*) [Count] ");
+      query.Append("FROM ( ");
+      query.Append("SELECT CAST(Timestamp AS DATE) [Day], SourceName ");
+      query.Append("FROM dbo.Stats ");
+      query.Append("GROUP BY CAST(Timestamp AS DATE), SourceName ) UniqueSourceNameByDay ");
+      query.Append("GROUP BY UniqueSourceNameByDay.[Day] ) NumberOfUniqueSourceNamesByDay");
+
+      List<double> results = _context.Database.SqlQuery<double>(query.ToString()).ToList();
+
+      if (results.Count > 0)
+      {
+        summary.AverageUniqueSourcesPerDay = (uint)results[0];
+      }
+
+      return View(summary);
     }
 
     //-------------------------------------------------------------------------

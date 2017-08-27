@@ -1,0 +1,15 @@
+﻿@model StatsDog.Models.StatsSummary
+
+@{
+  ViewBag.Title = "Summary";
+}
+
+<br/>
+<p>@Html.ActionLink("Detail", "Index")</p>
+
+<table class="table" style="width: 40%">
+  <tr>
+    <td>@Html.DisplayNameFor(model => model.AverageUniqueSourcesPerDay):</td>
+    <td>@Model.AverageUniqueSourcesPerDay.ToString()</td>
+  </tr>
+</table>
