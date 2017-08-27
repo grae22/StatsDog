@@ -17,7 +17,7 @@ namespace StatsDog
           defaults: new
           {
             controller = "Stats",
-            action = "Index",
+            action = "Summary",
             id = UrlParameter.Optional
           }
       );
