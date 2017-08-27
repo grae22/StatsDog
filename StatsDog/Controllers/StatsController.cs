@@ -56,9 +56,10 @@ namespace StatsDog.Controllers
       query.Append("GROUP BY CAST(Timestamp AS DATE), SourceName ) UniqueSourceNameByDay ");
       query.Append("GROUP BY UniqueSourceNameByDay.[Day] ) NumberOfUniqueSourceNamesByDay");
 
-      List<double> results = _context.Database.SqlQuery<double>(query.ToString()).ToList();
+      List<double?> results = _context.Database.SqlQuery<double?>(query.ToString()).ToList();
 
-      if (results.Count == 0)
+      if (results.Count == 0 ||
+          results[0] == null)
       {
         return 0;
       }
