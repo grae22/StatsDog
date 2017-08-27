@@ -1,4 +1,6 @@
-﻿@model StatsDog.Models.StatsSummary
+﻿@using StatsDog.Models
+
+@model StatsSummary
 
 @{
   ViewBag.Title = "Summary";
@@ -8,8 +10,24 @@
 <p>@Html.ActionLink("Detail", "Index")</p>
 
 <table class="table" style="width: 40%">
+  <caption><b>General</b></caption>
   <tr>
     <td>@Html.DisplayNameFor(model => model.AverageUniqueSourcesPerDay):</td>
     <td>@Model.AverageUniqueSourcesPerDay.ToString()</td>
   </tr>
+</table>
+
+<table class="table" style="width: 40%">
+  <caption><b>Unique sources per day</b></caption>
+  <tr>
+    <th>Date</th>
+    <th style="text-align: center;">Count</th>
+  </tr>
+  @foreach (StatsSummary.UniqueSourceCountByDate row in @Model.RecentUniqueSourcesPerDay)
+  {
+    <tr>
+      <td>@row.Date.ToString("yyyy-MM-dd (ddd)")</td>
+      <td style="text-align: center;">@row.Count</td>
+    </tr>
+  }
 </table>

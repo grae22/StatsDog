@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Data.Entity.Infrastructure;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Web.Mvc;
 using StatsDog.Models;
@@ -34,6 +36,16 @@ namespace StatsDog.Controllers
     {
       var summary = new StatsSummary();
 
+      summary.AverageUniqueSourcesPerDay = GetAverageUniqueSourcePerDay(summary);
+      summary.RecentUniqueSourcesPerDay = GetRecentUniqueSourcesPerDay();
+
+      return View(summary);
+    }
+
+    //-------------------------------------------------------------------------
+
+    private uint GetAverageUniqueSourcePerDay(StatsSummary summary)
+    {
       var query = new StringBuilder();
       query.Append("SELECT ROUND(AVG(CAST(NumberOfUniqueSourceNamesByDay.[Count] AS float)), 0) ");
       query.Append("FROM ( ");
@@ -46,12 +58,29 @@ namespace StatsDog.Controllers
 
       List<double> results = _context.Database.SqlQuery<double>(query.ToString()).ToList();
 
-      if (results.Count > 0)
+      if (results.Count == 0)
       {
-        summary.AverageUniqueSourcesPerDay = (uint)results[0];
+        return 0;
       }
 
-      return View(summary);
+      return (uint)results[0];
+    }
+
+    //-------------------------------------------------------------------------
+
+    private List<StatsSummary.UniqueSourceCountByDate> GetRecentUniqueSourcesPerDay()
+    {
+      var query = new StringBuilder();
+      query.Append("SELECT UniqueSourceNameByDay.[Day] [Date], COUNT(*) [Count] ");
+      query.Append("FROM ( ");
+      query.Append("SELECT CAST(Timestamp AS DATE) [Day], SourceName ");
+      query.Append("FROM dbo.Stats ");
+      query.Append("WHERE DATEDIFF(DAY, Timestamp, GETDATE()) < 7 ");
+      query.Append("GROUP BY CAST(Timestamp AS DATE), SourceName ) UniqueSourceNameByDay ");
+      query.Append("GROUP BY UniqueSourceNameByDay.[Day] ");
+      query.Append("ORDER BY UniqueSourceNameByDay.[Day] DESC");
+
+      return _context.Database.SqlQuery<StatsSummary.UniqueSourceCountByDate>(query.ToString()).ToList();
     }
 
     //-------------------------------------------------------------------------
