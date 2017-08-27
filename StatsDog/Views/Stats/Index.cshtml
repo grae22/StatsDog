@@ -23,7 +23,7 @@
       <td>@Html.DisplayFor(modelItem => item.ApplicationVersion)</td>
       <td>@Html.DisplayFor(modelItem => item.SourceName)</td>
       <td>@Html.DisplayFor(modelItem => item.EventName)</td>
-      <td>@Html.DisplayFor(modelItem => item.Timestamp.ToString("yyyy-MM-dd HH-mm"))</td>
+      <td>@item.Timestamp.ToString("yyyy-MM-dd HH:mm (ddd)")</td>
     </tr>
   }
 
