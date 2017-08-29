@@ -24,6 +24,7 @@ namespace StatsDog.Controllers
 
     public ViewResult Index()
     {
+      Response.AddHeader("Refresh", "300");
       return View(_context.Stats);
     }
 
@@ -31,6 +32,8 @@ namespace StatsDog.Controllers
 
     public ViewResult Summary()
     {
+      Response.AddHeader("Refresh", "300");
+
       var summary = new StatsSummary();
 
       summary.AverageUniqueSourcesPerDay = GetAverageUniqueSourcePerDay(summary);
