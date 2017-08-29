@@ -40,7 +40,9 @@
   
   <script>
     $(document).ready(function() {
-      $('#summary-table').DataTable();
+      $('#summary-table').DataTable({
+        "order": [[4, "desc"]]
+      });
     });
   </script>
 }
