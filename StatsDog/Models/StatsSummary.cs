@@ -14,6 +14,12 @@ namespace StatsDog.Models
       public int Count { get; set; }
     }
 
+    public struct SourceCountPerApplicationVersion
+    {
+      public string ApplicationVersion { get; set; }
+      public int Count { get; set; }
+    }
+
     //-------------------------------------------------------------------------
 
     [DisplayName("Avg. unique sources per day")]
@@ -21,6 +27,9 @@ namespace StatsDog.Models
 
     [DisplayName("Recent unique sources per day")]
     public List<UniqueSourceCountByDate> RecentUniqueSourcesPerDay { get; set; }
+
+    [DisplayName("Source counts by version")]
+    public List<SourceCountPerApplicationVersion> SourceCountByVersion { get; set; }
 
     //-------------------------------------------------------------------------
   }

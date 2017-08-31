@@ -38,6 +38,7 @@ namespace StatsDog.Controllers
 
       summary.AverageUniqueSourcesPerDay = GetAverageUniqueSourcePerDay(summary);
       summary.RecentUniqueSourcesPerDay = GetRecentUniqueSourcesPerDay();
+      summary.SourceCountByVersion = GetSourceCountsByVersion();
 
       return View(summary);
     }
@@ -82,6 +83,26 @@ namespace StatsDog.Controllers
       query.Append("ORDER BY UniqueSourceNameByDay.[Day] DESC");
 
       return _context.Database.SqlQuery<StatsSummary.UniqueSourceCountByDate>(query.ToString()).ToList();
+    }
+
+    //-------------------------------------------------------------------------
+
+    private List<StatsSummary.SourceCountPerApplicationVersion> GetSourceCountsByVersion()
+    {
+      var query = new StringBuilder();
+      query.Append("SELECT ApplicationVersion, COUNT(*) [Count] ");
+      query.Append("FROM ( ");
+      query.Append("SELECT DISTINCT SourceName, ( ");
+      query.Append("SELECT TOP 1 ApplicationVersion ");
+      query.Append("FROM dbo.Stats ");
+      query.Append("WHERE SourceName = A.SourceName ");
+      query.Append("ORDER BY Timestamp DESC ) ");
+      query.Append("AS ApplicationVersion ");
+      query.Append("FROM dbo.Stats AS A ) SourceNameAndVersion ");
+      query.Append("GROUP BY ApplicationVersion ");
+      query.Append("ORDER BY ApplicationVersion DESC");
+
+      return _context.Database.SqlQuery<StatsSummary.SourceCountPerApplicationVersion>(query.ToString()).ToList();
     }
 
     //-------------------------------------------------------------------------

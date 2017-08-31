@@ -30,8 +30,25 @@
     {
       <tr>
         <td>@row.Date.ToString("yyyy-MM-dd (ddd)")</td>
-      <td style="text-align: center;">@row.Count</td>
+        <td style="text-align: center;">@row.Count</td>
+      </tr>
+    }
+  </table>
+</p>
+
+<p>
+  <table class="table" style="width: 40%;">
+    <caption><b>Unique source count by version</b></caption>
+    <tr>
+      <th style="width: 75%;">Date</th>
+      <th style="text-align: center;">Count</th>
     </tr>
+    @foreach (StatsSummary.SourceCountPerApplicationVersion row in @Model.SourceCountByVersion)
+    {
+      <tr>
+        <td>@row.ApplicationVersion</td>
+        <td style="text-align: center;">@row.Count</td>
+      </tr>
     }
   </table>
 </p>
