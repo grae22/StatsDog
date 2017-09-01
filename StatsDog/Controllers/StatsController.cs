@@ -95,7 +95,7 @@ namespace StatsDog.Controllers
       query.Append("SELECT DISTINCT SourceName, ( ");
       query.Append("SELECT TOP 1 ApplicationVersion ");
       query.Append("FROM dbo.Stats ");
-      query.Append("WHERE SourceName = A.SourceName ");
+      query.Append("WHERE SourceName = A.SourceName AND DATEDIFF(Day, Timestamp, GETDATE()) < 7 ");
       query.Append("ORDER BY Timestamp DESC ) ");
       query.Append("AS ApplicationVersion ");
       query.Append("FROM dbo.Stats AS A ) SourceNameAndVersion ");
