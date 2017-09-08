@@ -10,6 +10,12 @@ namespace StatsDog.Controllers
   {
     //-------------------------------------------------------------------------
 
+    private struct LastEventDataBySource
+    {
+      public string SourceName { get; set; }
+      public string Data { get; set; }
+    }
+
     private readonly ApplicationDbContext _context = new ApplicationDbContext();
 
     //-------------------------------------------------------------------------
@@ -25,7 +31,7 @@ namespace StatsDog.Controllers
     public ViewResult Index()
     {
       Response.AddHeader("Refresh", "300");
-      return View(_context.Stats);
+      return View(_context.Stats.Where(x => x.ApplicationVersion.Equals("1.0.0.0") == false));
     }
 
     //-------------------------------------------------------------------------
@@ -37,6 +43,7 @@ namespace StatsDog.Controllers
       var summary = new StatsSummary();
 
       summary.AverageUniqueSourcesPerDay = GetAverageUniqueSourcePerDay(summary);
+      summary.TotalFilesOpened = GetTotalFilesOpenedCount();
       summary.RecentUniqueSourcesPerDay = GetRecentUniqueSourcesPerDay();
       summary.SourceCountByVersion = GetSourceCountsByVersion();
 
@@ -70,6 +77,23 @@ namespace StatsDog.Controllers
 
     //-------------------------------------------------------------------------
 
+    private uint GetTotalFilesOpenedCount()
+    {
+      var query = new StringBuilder();
+      query.Append("SELECT DISTINCT SourceName, ");
+      query.Append("( SELECT TOP 1 Data ");
+      query.Append("FROM dbo.Stats ");
+      query.Append("WHERE SourceName = A.SourceName ");
+      query.Append("ORDER BY Timestamp DESC ) [Data] ");
+      query.Append("FROM dbo.Stats A ");
+
+      var results = _context.Database.SqlQuery<LastEventDataBySource>(query.ToString()).ToList();
+
+      return (uint)results.Sum(x => ExtractFilesOpenedCountFromData(x.Data));
+    }
+
+    //-------------------------------------------------------------------------
+
     private List<StatsSummary.UniqueSourceCountByDate> GetRecentUniqueSourcesPerDay()
     {
       var query = new StringBuilder();
@@ -95,7 +119,9 @@ namespace StatsDog.Controllers
       query.Append("SELECT DISTINCT SourceName, ( ");
       query.Append("SELECT TOP 1 ApplicationVersion ");
       query.Append("FROM dbo.Stats ");
-      query.Append("WHERE SourceName = A.SourceName AND DATEDIFF(Day, Timestamp, GETDATE()) < 7 ");
+      query.Append("WHERE SourceName = A.SourceName ");
+      query.Append("AND DATEDIFF(Day, Timestamp, GETDATE()) < 7 ");
+      query.Append("AND ApplicationVersion != '1.0.0.0' ");
       query.Append("ORDER BY Timestamp DESC ) ");
       query.Append("AS ApplicationVersion ");
       query.Append("FROM dbo.Stats AS A ) SourceNameAndVersion ");
@@ -103,6 +129,37 @@ namespace StatsDog.Controllers
       query.Append("ORDER BY ApplicationVersion DESC");
 
       return _context.Database.SqlQuery<StatsSummary.SourceCountPerApplicationVersion>(query.ToString()).ToList();
+    }
+
+    //-------------------------------------------------------------------------
+
+    private static uint ExtractFilesOpenedCountFromData(string data)
+    {
+      const string tag = "FilesOpened:";
+
+      if (data == null ||
+          data.Any() == false)
+      {
+        return 0;
+      }
+
+      int index = data.IndexOf(tag);
+
+      if (index < 0)
+      {
+        return 0;
+      }
+
+      var countAsString = data.Substring(index + tag.Length, data.Length - tag.Length);
+
+      uint count;
+
+      if (uint.TryParse(countAsString, out count) == false)
+      {
+        return 0;
+      }
+
+      return count;
     }
 
     //-------------------------------------------------------------------------

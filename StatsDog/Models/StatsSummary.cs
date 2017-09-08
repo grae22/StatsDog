@@ -25,6 +25,9 @@ namespace StatsDog.Models
     [DisplayName("Avg. unique sources per day")]
     public uint AverageUniqueSourcesPerDay { get; set; }
 
+    [DisplayName("Total files opened")]
+    public uint TotalFilesOpened { get; set; }
+
     [DisplayName("Recent unique sources per day")]
     public List<UniqueSourceCountByDate> RecentUniqueSourcesPerDay { get; set; }
 

@@ -14,6 +14,7 @@
     <th>@Html.DisplayNameFor(model => model.ApplicationVersion)</th>
     <th>@Html.DisplayNameFor(model => model.SourceName)</th>
     <th>@Html.DisplayNameFor(model => model.EventName)</th>
+    <th>@Html.DisplayNameFor(model => model.Data)</th>
     <th>@Html.DisplayNameFor(model => model.Timestamp)</th>
   </tr>
   </thead>
@@ -26,6 +27,7 @@
       <td>@Html.DisplayFor(modelItem => item.ApplicationVersion)</td>
       <td>@Html.DisplayFor(modelItem => item.SourceName)</td>
       <td>@Html.DisplayFor(modelItem => item.EventName)</td>
+      <td>@Html.DisplayFor(modelItem => item.Data)</td>
       <td>@item.Timestamp.ToString("yyyy-MM-dd HH:mm (ddd)")</td>
     </tr>
   }
@@ -41,7 +43,7 @@
   <script>
     $(document).ready(function() {
       $('#summary-table').DataTable({
-        "order": [[4, "desc"]]
+        "order": [[5, "desc"]]
       });
     });
   </script>

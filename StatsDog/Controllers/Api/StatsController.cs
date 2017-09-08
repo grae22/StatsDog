@@ -33,6 +33,8 @@ namespace StatsDog.Controllers.Api
 
       Stats stats = Mapper.Map<StatsDto, Stats>(statsDto);
 
+      stats.Data = stats.Data ?? "";
+
       _applicationDbContext.Stats.Add(stats);
       _applicationDbContext.SaveChanges();
 

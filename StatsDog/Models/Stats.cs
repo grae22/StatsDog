@@ -24,6 +24,10 @@ namespace StatsDog.Models
     [StringLength(32)]
     public string EventName { get; set; }
 
+    [DisplayName("Data")]
+    [StringLength(64)]
+    public string Data { get; set; }
+
     [DisplayName("Timestamp")]
     public DateTime Timestamp { get; set; } = DateTime.Now;
   }

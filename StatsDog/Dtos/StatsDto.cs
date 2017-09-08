@@ -15,5 +15,8 @@ namespace StatsDog.Dtos
 
     [StringLength(32)]
     public string EventName { get; set; }
+
+    [StringLength(64)]
+    public string Data { get; set; }
   }
 }
