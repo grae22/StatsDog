@@ -31,7 +31,7 @@ namespace StatsDog.Controllers
     public ViewResult Index()
     {
       Response.AddHeader("Refresh", "300");
-      return View(_context.Stats.Where(x => x.ApplicationVersion.Equals("1.0.0.0") == false));
+      return View(_context.Stats);
     }
 
     //-------------------------------------------------------------------------
@@ -121,10 +121,10 @@ namespace StatsDog.Controllers
       query.Append("FROM dbo.Stats ");
       query.Append("WHERE SourceName = A.SourceName ");
       query.Append("AND DATEDIFF(Day, Timestamp, GETDATE()) < 7 ");
-      query.Append("AND ApplicationVersion != '1.0.0.0' ");
       query.Append("ORDER BY Timestamp DESC ) ");
       query.Append("AS ApplicationVersion ");
       query.Append("FROM dbo.Stats AS A ) SourceNameAndVersion ");
+      query.Append("WHERE ApplicationVersion IS NOT NULL ");
       query.Append("GROUP BY ApplicationVersion ");
       query.Append("ORDER BY ApplicationVersion DESC");
 
