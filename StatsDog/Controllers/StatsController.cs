@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web.Mvc;
@@ -143,14 +144,17 @@ namespace StatsDog.Controllers
         return 0;
       }
 
-      int index = data.IndexOf(tag);
+      string filesOpenedData =
+        data
+          .Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+          .FirstOrDefault(d => d.StartsWith(tag, StringComparison.OrdinalIgnoreCase));
 
-      if (index < 0)
+      if (filesOpenedData == null)
       {
         return 0;
       }
 
-      var countAsString = data.Substring(index + tag.Length, data.Length - tag.Length);
+      var countAsString = filesOpenedData.Substring(tag.Length, filesOpenedData.Length - tag.Length);
 
       uint count;
 
